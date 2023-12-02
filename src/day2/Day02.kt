@@ -9,9 +9,79 @@ val BLUE_MAX = 14
 
 fun main() {
     val start = System.currentTimeMillis()
-    part1()
+    part2()
 
     println("Your code blows! Ended in ${System.currentTimeMillis().minus(start)}ms")
+}
+
+fun part2() {
+    val testInput = readInput("day2", "input")
+    var sum = 0
+
+
+    for (input in testInput) {
+        val gameSum = getMinSumOfGame(input)
+
+        sum += gameSum
+    }
+
+    println("Sum was: $sum")
+}
+fun getMinSumOfGame(game: String): Int {
+    val idSpliterator = game.split(":")
+    val identifier = idSpliterator[0]
+
+    val setsOfBalls = idSpliterator[1].split("; ")
+    // R G B
+    val mins = arrayOf(-1, -1, -1)
+
+    for (set in setsOfBalls) {
+        val individualBalls = set.split(", ")
+
+        for (ball in individualBalls) {
+            val count = getBallCount(ball)
+
+            when (getBallColor(ball)) {
+                "red" -> {
+                    val red = mins[0]
+
+                    mins[0] = if (red == -1) {
+                        count
+                    } else {
+                        max(red, count)
+                    }
+                }
+
+                "green" -> {
+                    val green = mins[1]
+
+                    mins[1] = if (green == -1) {
+                        count
+                    } else {
+                        max(green, count)
+                    }
+                }
+
+                "blue" -> {
+                    val blue = mins[2]
+
+                    mins[2] = if (blue == -1) {
+                        count
+                    } else {
+                        max(blue, count)
+                    }
+                }
+            }
+        }
+    }
+
+    var sum = 1
+
+    for (answer in mins) {
+        sum *= answer
+    }
+
+    return sum
 }
 
 fun part1() {
