@@ -69,16 +69,12 @@ fun findWordedSum(s: String): Int {
         val count = getTimesContained(s, word)
         var lastSearchIndex = 0
 
-        println("$word found in string $count times")
-
         for (iteration in 0 until count) {
             val raw = if (count == 1) {
                 s.indexOf(word, 0)
             } else {
                 s.indexOf(word, lastSearchIndex)
             }
-
-            println("Raw index of ${word}: $raw")
 
             lastSearchIndex = (raw + (word.length - 1))
 
@@ -119,6 +115,7 @@ fun findWordedSum(s: String): Int {
 
     return digs[0].concat(digs[1])
 }
+
 fun part1() {
     val testInput = readInput("day1", "input")
     var sum = 0
