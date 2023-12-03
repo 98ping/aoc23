@@ -7,19 +7,22 @@ val RED_MAX = 12
 val GREEN_MAX = 13
 val BLUE_MAX = 14
 
-fun main() {
+fun main()
+{
     val start = System.currentTimeMillis()
     part2()
 
     println("Your code blows! Ended in ${System.currentTimeMillis().minus(start)}ms")
 }
 
-fun part2() {
+fun part2()
+{
     val testInput = readInput("day2", "input")
     var sum = 0
 
 
-    for (input in testInput) {
+    for (input in testInput)
+    {
         val gameSum = getMinSumOfGame(input)
 
         sum += gameSum
@@ -27,7 +30,9 @@ fun part2() {
 
     println("Sum was: $sum")
 }
-fun getMinSumOfGame(game: String): Int {
+
+fun getMinSumOfGame(game: String): Int
+{
     val idSpliterator = game.split(":")
     val identifier = idSpliterator[0]
 
@@ -35,39 +40,51 @@ fun getMinSumOfGame(game: String): Int {
     // R G B
     val mins = arrayOf(-1, -1, -1)
 
-    for (set in setsOfBalls) {
+    for (set in setsOfBalls)
+    {
         val individualBalls = set.split(", ")
 
-        for (ball in individualBalls) {
+        for (ball in individualBalls)
+        {
             val count = getBallCount(ball)
 
-            when (getBallColor(ball)) {
-                "red" -> {
+            when (getBallColor(ball))
+            {
+                "red" ->
+                {
                     val red = mins[0]
 
-                    mins[0] = if (red == -1) {
+                    mins[0] = if (red == -1)
+                    {
                         count
-                    } else {
+                    } else
+                    {
                         max(red, count)
                     }
                 }
 
-                "green" -> {
+                "green" ->
+                {
                     val green = mins[1]
 
-                    mins[1] = if (green == -1) {
+                    mins[1] = if (green == -1)
+                    {
                         count
-                    } else {
+                    } else
+                    {
                         max(green, count)
                     }
                 }
 
-                "blue" -> {
+                "blue" ->
+                {
                     val blue = mins[2]
 
-                    mins[2] = if (blue == -1) {
+                    mins[2] = if (blue == -1)
+                    {
                         count
-                    } else {
+                    } else
+                    {
                         max(blue, count)
                     }
                 }
@@ -77,19 +94,22 @@ fun getMinSumOfGame(game: String): Int {
 
     var sum = 1
 
-    for (answer in mins) {
+    for (answer in mins)
+    {
         sum *= answer
     }
 
     return sum
 }
 
-fun part1() {
+fun part1()
+{
     val testInput = readInput("day2", "input")
     var sum = 0
 
 
-    for (input in testInput) {
+    for (input in testInput)
+    {
         val gameSum = getSumOfGame(input)
 
         sum += gameSum
@@ -97,7 +117,9 @@ fun part1() {
 
     println("Sum was: $sum")
 }
-fun getSumOfGame(game: String): Int {
+
+fun getSumOfGame(game: String): Int
+{
     val idSpliterator = game.split(":")
     val identifier = idSpliterator[0]
     val char = identifier.split(" ")[1]
@@ -108,29 +130,36 @@ fun getSumOfGame(game: String): Int {
     var red = 0
     var green = 0
 
-    for (set in setsOfBalls) {
+    for (set in setsOfBalls)
+    {
         val individualBalls = set.split(", ")
 
-        for (ball in individualBalls) {
+        for (ball in individualBalls)
+        {
             val count = getBallCount(ball)
 
-            when (getBallColor(ball)) {
-                "red" -> {
+            when (getBallColor(ball))
+            {
+                "red" ->
+                {
                     red = max(red, count)
                 }
 
-                "green" -> {
+                "green" ->
+                {
                     green = max(green, count)
                 }
 
-                "blue" -> {
+                "blue" ->
+                {
                     blue = max(blue, count)
                 }
             }
         }
     }
 
-    if (blue <= BLUE_MAX && red <= RED_MAX && green <= GREEN_MAX) {
+    if (blue <= BLUE_MAX && red <= RED_MAX && green <= GREEN_MAX)
+    {
         println("Game $char was valid")
         return number
     }
@@ -138,14 +167,16 @@ fun getSumOfGame(game: String): Int {
     return 0
 }
 
-fun getBallCount(ball: String): Int {
+fun getBallCount(ball: String): Int
+{
     val split = ball.removePrefix(" ").split(" ")
     val count = split[0]
 
     return count.toIntOrNull() ?: 0
 }
 
-fun getBallColor(ball: String): String {
+fun getBallColor(ball: String): String
+{
     val split = ball.removePrefix(" ").split(" ")
 
     return split[1]
