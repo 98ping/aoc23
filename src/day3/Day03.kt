@@ -22,7 +22,11 @@ fun part1()
 
         for (number in numbers)
         {
+            val indices = findIndicesFor(number, line)
 
+            for (index in indices) {
+                println("Index of number: $index")
+            }
         }
     }
 
@@ -64,6 +68,29 @@ fun getNumbers(line: String): MutableList<Int>
     }
 
     return numbers
+}
+
+
+fun findIndicesFor(number: Int, l: String) : MutableList<Int> {
+    val indices = mutableListOf<Int>()
+    val numberString = number.toString()
+    var line = l
+
+    if (!line.contains(numberString)) return indices
+
+    while (line.contains(numberString)) {
+        val index = line.indexOf(numberString)
+        val end = index + (numberString.length - 1)
+        indices.add(index)
+
+        for (int in 1 until numberString.length) {
+            indices.add(index + int)
+        }
+
+        line = line.substring(0, end)
+    }
+
+    return indices
 }
 
 fun getSymbolsInString(string: String): MutableList<Int>
