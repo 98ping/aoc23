@@ -12,7 +12,7 @@ fun main() {
 }
 
 fun part1() {
-    val testInput = readInput("day7", "input")
+    val testInput = readInput("day7", "test")
 
     val cards: MutableMap<MutableList<Char>, Int> = mutableMapOf()
 
@@ -20,6 +20,8 @@ fun part1() {
         val lineCards = line.substring(0, 5)
             .trim()
             .toMutableList()
+
+        println(lineCards)
 
         val lineBet = line.removeRange(0, 5).trim().toInt()
 
@@ -31,12 +33,13 @@ fun part1() {
     for (entry in cards.entries) {
         val hand = Hand(entry.key)
 
-        resultMap[hand.characters] = hand.getHandRating()
+        resultMap[hand.chars] = hand.getHandRating()
     }
 
+    println(resultMap.toString())
 }
 
-data class Hand(val characters: MutableList<Char>) {
+data class Hand(val chars: MutableList<Char>) {
 
     private val casePriority = mutableMapOf(
         "five-of-a-kind" to 7,
@@ -49,6 +52,8 @@ data class Hand(val characters: MutableList<Char>) {
     )
 
     fun getHandRating() : Int {
+        val characters = chars.toMutableList()
+
         // all same type
         if (characters.all { it == characters[0] }) {
             return casePriority["five-of-a-kind"]!!
