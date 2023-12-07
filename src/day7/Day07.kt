@@ -36,7 +36,13 @@ fun part1() {
         resultMap[hand.chars] = hand.getHandRating()
     }
 
-    println(resultMap.toString())
+    val bestCard = resultMap.entries.maxByOrNull { it.value }?.value ?: return
+    val opposition = resultMap.filter { it.value == bestCard }
+
+    if (opposition.isNotEmpty()) {
+        println("Found an opposition for hand rating $bestCard")
+        println("Opponents: $opposition")
+    }
 }
 
 data class Hand(val chars: MutableList<Char>) {
