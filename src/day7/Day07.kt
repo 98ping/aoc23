@@ -2,11 +2,11 @@ package day7
 
 import readInput
 
-val STRENGTHS = arrayOf('A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2')
+val PT2 = true
 
 fun main() {
     val start = System.currentTimeMillis()
-    part1()
+    part2()
 
     println("Your code blows! Ended in ${System.currentTimeMillis().minus(start)}ms")
 }
@@ -14,91 +14,119 @@ fun main() {
 fun part1() {
     val testInput = readInput("day7", "test")
 
-    val cards: MutableMap<MutableList<Char>, Int> = mutableMapOf()
+    val games = mutableListOf<Game>()
+    var sum = 0
 
     for (line in testInput) {
         val lineCards = line.substring(0, 5)
             .trim()
-            .toMutableList()
-
-        println(lineCards)
 
         val lineBet = line.removeRange(0, 5).trim().toInt()
 
-        cards[lineCards] = lineBet
+        games.add(Game(lineCards, lineBet))
     }
 
-    val resultMap = mutableMapOf<MutableList<Char>, Int>()
-
-    for (entry in cards.entries) {
-        val hand = Hand(entry.key)
-
-        resultMap[hand.chars] = hand.getHandRating()
+    games.sortedWith(
+        compareBy({ it.hand.getHandType() }, { it })
+    ).forEachIndexed { i, v ->
+        sum += (i + 1) * v.bid
     }
 
-    val bestCard = resultMap.entries.maxByOrNull { it.value }?.value ?: return
-    val opposition = resultMap.filter { it.value == bestCard }
+    println("Sum of all cards and their ranks is: $sum")
+}
 
-    if (opposition.isNotEmpty()) {
-        println("Found an opposition for hand rating $bestCard")
-        println("Opponents: $opposition")
+fun part2() {
+    val testInput = readInput("day7", "input")
+
+    val games = mutableListOf<Game>()
+    var sum = 0
+
+    for (line in testInput) {
+        val lineCards = line.substring(0, 5)
+            .trim()
+
+        val lineBet = line.removeRange(0, 5).trim().toInt()
+
+        games.add(Game(lineCards, lineBet))
+    }
+
+    games.sortedWith(
+        compareBy({ it.hand.getHandTypeWithJoker() }, { it })
+    ).forEachIndexed { i, v ->
+        sum += (i + 1) * v.bid
+    }
+
+    println("Sum of all cards and their ranks is: $sum")
+}
+
+enum class HandType {
+    HIGH, ONE_PAIR, TWO_PAIR, THREE, FULL, FOUR, FIVE;
+}
+
+fun String.distinct() = toSet().size
+
+fun String.frequencies() = groupingBy { it }.eachCount()
+
+fun String.getHandType(): HandType {
+    return when (distinct()) {
+        1 -> HandType.FIVE
+        2 -> {
+            val firstCardCount = count { it == this.first() }
+            if (firstCardCount == 2 || firstCardCount == 3) {
+                HandType.FULL
+            } else {
+                HandType.FOUR
+            }
+        }
+
+        3 -> {
+            val frequencies = frequencies()
+            if (frequencies.any { it.value == 3 }) {
+                HandType.THREE
+            } else {
+                HandType.TWO_PAIR
+            }
+        }
+
+        4 -> HandType.ONE_PAIR
+        5 -> HandType.HIGH
+        else -> throw IllegalStateException()
     }
 }
 
-data class Hand(val chars: MutableList<Char>) {
+fun String.jokerHand(): String {
+    val frequencies = frequencies().filter { it.key != 'J' }
+    if (frequencies.isEmpty()) return "11111"
 
-    private val casePriority = mutableMapOf(
-        "five-of-a-kind" to 7,
-        "four-of-a-kind" to 6,
-        "full-house" to 5,
-        "three-of-a-kind" to 4,
-        "two-pair" to 3,
-        "one-pair" to 2,
-        "high-card" to 1
-    )
+    val highestFrequency = frequencies.values.max()
+    val mostFrequentCard = first { frequencies[it] == highestFrequency }
+    return replace('J', mostFrequentCard)
+}
 
-    fun getHandRating() : Int {
-        val characters = chars.toMutableList()
+fun String.getHandTypeWithJoker(): HandType {
+    return jokerHand().getHandType()
+}
 
-        // all same type
-        if (characters.all { it == characters[0] }) {
-            return casePriority["five-of-a-kind"]!!
+fun Char.cardValue(): Int {
+    val asString = this.toString()
+    return if (Card.values().any { it.name == asString }) Card.valueOf(asString).n
+    else this.digitToInt()
+}
+
+enum class Card(val n: Int) {
+    A(14), K(13), Q(12), J(if (PT2) 1 else 11), T(10)
+}
+
+data class Game(
+    var hand: String,
+    var bid: Int
+) : Comparable<Game> {
+    override fun compareTo(other: Game): Int {
+        hand.zip(other.hand).forEach { (our, other) ->
+            val difference = our.cardValue() - other.cardValue()
+            if (difference != 0) return difference
         }
-
-        // 4 are same type
-        if (characters.any { char -> characters.count { it == char } == 4}) {
-            return casePriority["four-of-a-kind"]!!
-        }
-
-        // 3 are same type
-        if (characters.any { char -> characters.count { it == char } == 3}) {
-            val highestOccurringCharacter = characters.first { char -> characters.count { it == char} == 3}
-
-            characters.removeIf { it == highestOccurringCharacter }
-
-            // full house (all similar)
-            return if (characters.all { it == characters[0] }) {
-                casePriority["full-house"]!!
-            } else {
-                // not similar
-                casePriority["three-of-a-kind"]!!
-            }
-        }
-
-        // same process as above
-        if (characters.any { char -> characters.count { it == char } == 2}) {
-            val highestOccurringCharacter = characters.first { char -> characters.count { it == char} == 2}
-
-            characters.removeIf { it == highestOccurringCharacter }
-
-            return if (characters.firstOrNull { char -> characters.count { it == char} == 2} != null) {
-                casePriority["two-pair"]!!
-            } else {
-                casePriority["one-pair"]!!
-            }
-        }
-
-        // unique
-        return casePriority["high-card"]!!
+        return 0
     }
+
 }
