@@ -9,6 +9,8 @@ fun main() {
     println("Your code blows! Ended in ${System.currentTimeMillis().minus(start)}ms")
 }
 
+
+
 fun part1() {
     val testInput = readInput("day8", "input")
 
