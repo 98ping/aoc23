@@ -1,15 +1,14 @@
 package day13
 
-import com.sun.org.apache.xpath.internal.operations.Bool
+import ltd.matrixstudios.helpers.max
 import readInput
 
+// totally gave up on this 1 too
 fun main() {
     val start = System.currentTimeMillis()
-    part1()
 
     println("Your code blows! Ended in ${System.currentTimeMillis().minus(start)}ms")
 }
-
 
 fun part1() {
     val input = readInput("day13", "test")
@@ -38,7 +37,7 @@ fun part1() {
     println(getHorizontalReflection(first))
 }
 
-fun getHorizontalReflection(puzzle: Puzzle) : Int {
+fun getHorizontalReflection(puzzle: Puzzle) : Pair<Int, Int> {
     var leftColumns = 0
     var rightColumns = 0
 
@@ -46,20 +45,42 @@ fun getHorizontalReflection(puzzle: Puzzle) : Int {
         val leftLines = mutableListOf<String>()
         val rightLines = mutableListOf<String>()
 
+        println("Checking axis: $axis")
+
         for (line in puzzle.lines) {
             leftLines.add(line.substring(0, axis + 1))
             rightLines.add(line.substring(axis + 1, line.length))
         }
 
-        println(leftLines.toString())
-        println(rightLines.toString())
+        if (verifyEquivalence(leftLines, rightLines)) {
+            leftColumns = leftLines.size
+            rightColumns = rightLines.size
+        }
     }
 
-    return 0
+    return Pair(leftColumns, rightColumns)
 }
 
-fun verifyEquivalence(first: MutableList<String>, second: MutableList<String>) : Boolean {
-    return true
+fun verifyEquivalence(leftLines: MutableList<String>, rightLines: MutableList<String>) : Boolean {
+    var matching = true
+    val maxIndex = max(leftLines.size, rightLines.size)
+
+    println(leftLines.toString())
+    println(rightLines.toString())
+
+    for (check in maxIndex downTo 0) {
+        val lCol = leftLines.getOrNull(check)
+        val rCol = rightLines.getOrNull(check)
+
+        if (lCol == rCol) {
+            println("right column equals left column")
+        } else {
+            matching = false
+            break
+        }
+    }
+
+    return matching
 }
 
 data class Puzzle(val lines: MutableList<String>)
